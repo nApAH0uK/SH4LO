@@ -135,7 +135,7 @@ namespace BHEIIIKA
                 IsPassword = true
             };
 
-            // Чекбокс
+            // Чекбокс (теперь берется из Form2/Form1)
             chkRememberMe = new ModernCheckBox
             {
                 Text = "Запомнить меня",
@@ -197,113 +197,6 @@ namespace BHEIIIKA
             Username = username;
             Password = password;
             RememberMe = rememberMe;
-        }
-    }
-
-    // === СТИЛИЗОВАННЫЙ АНИМИРОВАННЫЙ ЧЕКБОКС ===
-    public class ModernCheckBox : CheckBox
-    {
-        private readonly System.Windows.Forms.Timer _animTimer;
-        private float _checkProgress = 0f;
-
-        public ModernCheckBox()
-        {
-            SetStyle(ControlStyles.UserPaint |
-                     ControlStyles.AllPaintingInWmPaint |
-                     ControlStyles.OptimizedDoubleBuffer |
-                     ControlStyles.SupportsTransparentBackColor |
-                     ControlStyles.ResizeRedraw, true);
-
-            BackColor = Color.Transparent;
-            Cursor = Cursors.Hand;
-            Font = new Font("Segoe UI", 9F);
-            ForeColor = Color.FromArgb(243, 244, 246);
-
-            _animTimer = new System.Windows.Forms.Timer { Interval = 15 };
-            _animTimer.Tick += (s, e) =>
-            {
-                if (Checked)
-                {
-                    _checkProgress += 0.15f;
-                    if (_checkProgress >= 1f) { _checkProgress = 1f; _animTimer.Stop(); }
-                }
-                else
-                {
-                    _checkProgress -= 0.15f;
-                    if (_checkProgress <= 0f) { _checkProgress = 0f; _animTimer.Stop(); }
-                }
-                Invalidate();
-            };
-        }
-
-        protected override void OnCheckedChanged(EventArgs e)
-        {
-            base.OnCheckedChanged(e);
-            _animTimer.Start();
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs pevent) { }
-
-        private Color InterpolateColor(Color c1, Color c2, float factor)
-        {
-            int r = (int)(c1.R + (c2.R - c1.R) * factor);
-            int g = (int)(c1.G + (c2.G - c1.G) * factor);
-            int b = (int)(c1.B + (c2.B - c1.B) * factor);
-            return Color.FromArgb(r, g, b);
-        }
-
-        protected override void OnPaint(PaintEventArgs pevent)
-        {
-            Graphics g = pevent.Graphics;
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-
-            Color bg = Parent != null ? Parent.BackColor : Color.FromArgb(30, 27, 43);
-            using (SolidBrush bgBrush = new SolidBrush(bg))
-            {
-                g.FillRectangle(bgBrush, ClientRectangle);
-            }
-
-            int boxSize = 16;
-            int boxX = 1;
-            int boxY = (Height - boxSize) / 2;
-            Rectangle boxRect = new Rectangle(boxX, boxY, boxSize, boxSize);
-
-            Color inactiveBorder = Color.FromArgb(70, 65, 90);
-            Color activeBorder = Color.FromArgb(217, 70, 239);
-            Color currentBorder = InterpolateColor(inactiveBorder, activeBorder, _checkProgress);
-
-            Color inactiveBg = Color.FromArgb(16, 14, 23);
-            Color activeBg = Color.FromArgb(217, 70, 239);
-            Color currentBg = InterpolateColor(inactiveBg, activeBg, _checkProgress);
-
-            using (GraphicsPath path = LoginForm.GetRoundRectPath(boxRect, 4))
-            {
-                using (SolidBrush fillBrush = new SolidBrush(currentBg))
-                {
-                    g.FillPath(fillBrush, path);
-                }
-                using (Pen borderPen = new Pen(currentBorder, 1.5f))
-                {
-                    g.DrawPath(borderPen, path);
-                }
-            }
-
-            if (_checkProgress > 0f)
-            {
-                using (Pen checkPen = new Pen(Color.White, 2f))
-                {
-                    PointF[] checkPoints = new PointF[]
-                    {
-                        new PointF(boxX + 3.5f, boxY + 8f),
-                        new PointF(boxX + 6.5f, boxY + 11.5f),
-                        new PointF(boxX + 12.5f, boxY + 4.5f)
-                    };
-                    g.DrawLines(checkPen, checkPoints);
-                }
-            }
-
-            Rectangle textRect = new Rectangle(boxSize + 10, 0, Width - boxSize - 10, Height);
-            TextRenderer.DrawText(g, Text, Font, textRect, ForeColor, TextFormatFlags.VerticalCenter | TextFormatFlags.Left);
         }
     }
 }

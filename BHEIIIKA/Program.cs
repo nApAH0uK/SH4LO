@@ -14,7 +14,7 @@ namespace BHEIIIKA
             ApplicationConfiguration.Initialize();
 
             // Запуск главной формы
-            Application.Run(new Form2());
+            Application.Run(new Form1());
         }
     }
 }
